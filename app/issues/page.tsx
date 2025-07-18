@@ -158,6 +158,7 @@ export default function IssuesPage() {
           return b.comments - a.comments
         case "difficulty":
           const difficultyOrder = { easy: 1, moderate: 2, hard: 3 }
+          //@ts-ignore
           return difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty]
         default:
           return 0 // Keep original order for "recent"
@@ -190,6 +191,7 @@ export default function IssuesPage() {
       Markdown: "bg-gray-100 text-gray-800",
       C: "bg-slate-100 text-slate-800",
     }
+    //@ts-ignore
     return colors[language] || "bg-gray-100 text-gray-800"
   }
 
