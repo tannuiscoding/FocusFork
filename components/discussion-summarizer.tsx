@@ -94,7 +94,7 @@ export function DiscussionSummarizer({ onDiscussionAdded, className }: Discussio
 
   return (
     <div className={className}>
-      <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+      <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/50 dark:to-purple-950/50 border-blue-200 dark:border-blue-800">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-blue-600" />
@@ -127,13 +127,13 @@ export function DiscussionSummarizer({ onDiscussionAdded, className }: Discussio
           </div>
 
           {!isValidInput && input.trim() && (
-            <p className="text-sm text-amber-600 bg-amber-50 p-2 rounded border border-amber-200">
+            <p className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 p-2 rounded border border-amber-200 dark:border-amber-800">
               Please enter a valid GitHub discussion URL or numeric ID
             </p>
           )}
 
           {lastSummary && (
-            <div className="mt-4 p-4 bg-white rounded-lg border border-green-200">
+            <div className="mt-4 p-4 bg-white dark:bg-slate-800 rounded-lg border border-green-200 dark:border-green-800">
               <div className="flex items-center gap-2 mb-2">
                 <Badge className="bg-green-100 text-green-800">✓ Successfully Summarized</Badge>
                 <Badge className="bg-purple-100 text-purple-800">
@@ -141,8 +141,10 @@ export function DiscussionSummarizer({ onDiscussionAdded, className }: Discussio
                   AI Generated
                 </Badge>
               </div>
-              <h4 className="font-medium text-sm text-slate-700 mb-1">{lastSummary.title}</h4>
-              <p className="text-xs text-slate-500">Added to discussions • {lastSummary.participants} participants</p>
+              <h4 className="font-medium text-sm text-slate-700 dark:text-slate-300 mb-1">{lastSummary.title}</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Added to discussions • {lastSummary.participants} participants
+              </p>
             </div>
           )}
         </CardContent>

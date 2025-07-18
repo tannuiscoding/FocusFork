@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { GitBranch, Search, Users, ExternalLink, Clock, Star, GitPullRequest } from "lucide-react"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 // Extended mock data for issues
 const allIssues = [
@@ -193,9 +194,9 @@ export default function IssuesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       {/* Header */}
-      <header className="border-b bg-white sticky top-0 z-50">
+      <header className="border-b bg-white dark:bg-slate-800 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
@@ -206,20 +207,29 @@ export default function IssuesPage() {
             </span>
           </Link>
           <nav className="hidden md:flex items-center gap-6">
-            <Link href="/dashboard" className="text-slate-600 hover:text-slate-900 transition-colors">
+            <Link
+              href="/dashboard"
+              className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+            >
               Dashboard
             </Link>
-            <Link href="/discussions" className="text-slate-600 hover:text-slate-900 transition-colors">
+            <Link
+              href="/discussions"
+              className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+            >
               Discussions
             </Link>
             <Link href="/issues" className="text-blue-600 font-medium">
               Issues
             </Link>
           </nav>
-          <Button variant="outline">
-            <Users className="w-4 h-4 mr-2" />
-            Profile
-          </Button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Button variant="outline">
+              <Users className="w-4 h-4 mr-2" />
+              Profile
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -227,7 +237,7 @@ export default function IssuesPage() {
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Open Issues</h1>
-          <p className="text-slate-600">Find contribution opportunities across PLDG repositories</p>
+          <p className="text-slate-600 dark:text-slate-300">Find contribution opportunities across PLDG repositories</p>
         </div>
 
         {/* Stats */}
@@ -353,7 +363,7 @@ export default function IssuesPage() {
 
         {/* Results Summary */}
         <div className="mb-6">
-          <p className="text-slate-600">
+          <p className="text-slate-600 dark:text-slate-300">
             Showing {filteredIssues.length} issue{filteredIssues.length !== 1 ? "s" : ""}
             {searchTerm && ` matching "${searchTerm}"`}
           </p>

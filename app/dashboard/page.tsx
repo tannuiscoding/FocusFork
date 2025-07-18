@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { GitBranch, MessageSquare, Search, ExternalLink, Clock, Users, ArrowRight } from "lucide-react"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 // Mock data
 const discussions = [
@@ -145,9 +146,9 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       {/* Header */}
-      <header className="border-b bg-white sticky top-0 z-50">
+      <header className="border-b bg-white dark:bg-slate-800 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
@@ -161,17 +162,26 @@ export default function DashboardPage() {
             <Link href="/dashboard" className="text-blue-600 font-medium">
               Dashboard
             </Link>
-            <Link href="/discussions" className="text-slate-600 hover:text-slate-900 transition-colors">
+            <Link
+              href="/discussions"
+              className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+            >
               Discussions
             </Link>
-            <Link href="/issues" className="text-slate-600 hover:text-slate-900 transition-colors">
+            <Link
+              href="/issues"
+              className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+            >
               Issues
             </Link>
           </nav>
-          <Button variant="outline">
-            <Users className="w-4 h-4 mr-2" />
-            Profile
-          </Button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Button variant="outline">
+              <Users className="w-4 h-4 mr-2" />
+              Profile
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -179,7 +189,9 @@ export default function DashboardPage() {
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Welcome back!</h1>
-          <p className="text-slate-600">Stay up to date with the latest discussions and contribution opportunities.</p>
+          <p className="text-slate-600 dark:text-slate-300">
+            Stay up to date with the latest discussions and contribution opportunities.
+          </p>
         </div>
 
         {/* Stats Cards */}
@@ -225,7 +237,7 @@ export default function DashboardPage() {
 
           <TabsContent value="discussions" className="space-y-6">
             {/* Quick Add Discussion */}
-            <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+            <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/50 dark:to-purple-950/50 border-blue-200 dark:border-blue-800">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <MessageSquare className="w-5 h-5 text-blue-600" />
