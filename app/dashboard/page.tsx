@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,6 +10,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { GitBranch, MessageSquare, Search, ExternalLink, Clock, Users, ArrowRight } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { useAuth } from "@/components/AuthProvider"
+import SignInModal from "@/components/SignInModal"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu"
+import { supabase } from "@/lib/supabaseClient"
 
 // Mock data
 const discussions = [
@@ -85,6 +95,17 @@ const issues = [
 ]
 
 export default function DashboardPage() {
+  const { user, loading } = useAuth()
+  const [modalOpen, setModalOpen] = useState(false)
+
+  // Show modal if not signed in and not loading
+  useEffect(() => {
+    if (!loading && !user) setModalOpen(true)
+    else setModalOpen(false)
+  }, [user, loading])
+
+  if (loading) return null
+
   const [searchTerm, setSearchTerm] = useState("")
   const [difficultyFilter, setDifficultyFilter] = useState("all")
   const [languageFilter, setLanguageFilter] = useState("all")
@@ -146,282 +167,302 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
-      {/* Header */}
-      <header className="border-b bg-white dark:bg-slate-800 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <GitBranch className="w-4 h-4 text-white" />
+    <>
+      <SignInModal open={modalOpen} onOpenChange={() => { }} />
+      {!user ? null : (
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+          {/* Header */}
+          <header className="border-b bg-white dark:bg-slate-800 sticky top-0 z-50">
+            <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+              <Link href="/" className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                  <GitBranch className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  PLDG Hub
+                </span>
+              </Link>
+              <nav className="hidden md:flex items-center gap-6">
+                <Link href="/dashboard" className="text-blue-600 font-medium">
+                  Dashboard
+                </Link>
+                <Link
+                  href="/discussions"
+                  className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+                >
+                  Discussions
+                </Link>
+                <Link
+                  href="/issues"
+                  className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+                >
+                  Issues
+                </Link>
+              </nav>
+              <div className="flex items-center gap-2">
+                <ThemeToggle />
+                {user && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Avatar className="cursor-pointer">
+                        <AvatarImage src={user.user_metadata?.avatar_url || undefined} alt={user.email || "User"} />
+                        <AvatarFallback>{user.email?.[0]?.toUpperCase() || "U"}</AvatarFallback>
+                      </Avatar>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={async () => {
+                          await supabase.auth.signOut()
+                        }}
+                      >
+                        Log out
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </div>
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              PLDG Hub
-            </span>
-          </Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="/dashboard" className="text-blue-600 font-medium">
-              Dashboard
-            </Link>
-            <Link
-              href="/discussions"
-              className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
-            >
-              Discussions
-            </Link>
-            <Link
-              href="/issues"
-              className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
-            >
-              Issues
-            </Link>
-          </nav>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <Button variant="outline">
-              <Users className="w-4 h-4 mr-2" />
-              Profile
-            </Button>
+          </header>
+
+          <div className="container mx-auto px-4 py-8">
+            {/* Welcome Section */}
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold mb-2">Welcome back!</h1>
+              <p className="text-slate-600 dark:text-slate-300">
+                Stay up to date with the latest discussions and contribution opportunities.
+              </p>
+            </div>
+
+            {/* Stats Cards */}
+            <div className="grid md:grid-cols-3 gap-6 mb-8">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Active Discussions</CardTitle>
+                  <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">24</div>
+                  <p className="text-xs text-muted-foreground">+3 from last week</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Open Issues</CardTitle>
+                  <GitBranch className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">156</div>
+                  <p className="text-xs text-muted-foreground">42 beginner-friendly</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Contributors</CardTitle>
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">1,247</div>
+                  <p className="text-xs text-muted-foreground">+89 this month</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Main Content */}
+            <Tabs defaultValue="discussions" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="discussions">Recent Discussions</TabsTrigger>
+                <TabsTrigger value="issues">Available Issues</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="discussions" className="space-y-6">
+                {/* Quick Add Discussion */}
+                <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/50 dark:to-purple-950/50 border-blue-200 dark:border-blue-800">
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <MessageSquare className="w-5 h-5 text-blue-600" />
+                      Quick Summarize
+                    </CardTitle>
+                    <CardDescription>Enter a GitHub discussion link or ID to generate an AI summary</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="GitHub discussion URL or ID..."
+                        value={discussionInput}
+                        onChange={(e) => setDiscussionInput(e.target.value)}
+                        className="flex-1"
+                        disabled={isLoadingDiscussion}
+                      />
+                      <Button
+                        onClick={handleAddDiscussion}
+                        disabled={!discussionInput.trim() || isLoadingDiscussion}
+                        className="shrink-0"
+                      >
+                        {isLoadingDiscussion ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                            Summarizing...
+                          </>
+                        ) : (
+                          "Summarize"
+                        )}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <div className="space-y-4">
+                  {dashboardDiscussions.map((discussion) => (
+                    <Card key={discussion.id} className="hover:shadow-md transition-shadow">
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div className="space-y-2">
+                            <CardTitle className="text-lg hover:text-blue-600 cursor-pointer">{discussion.title}</CardTitle>
+                            <div className="flex items-center gap-2 text-sm text-slate-500">
+                              <span>{discussion.repository}</span>
+                              <span>•</span>
+                              <div className="flex items-center gap-1">
+                                <Users className="w-3 h-3" />
+                                {discussion.participants} participants
+                              </div>
+                              <span>•</span>
+                              <div className="flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {discussion.lastActivity}
+                              </div>
+                            </div>
+                          </div>
+                          <Button variant="ghost" size="sm">
+                            <ExternalLink className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-slate-600 mb-4">{discussion.summary}</p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex gap-2">
+                            {discussion.tags.map((tag) => (
+                              <Badge key={tag} variant="secondary" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
+                            {discussion.tags.includes("ai-summarized") && (
+                              <Badge className="bg-purple-100 text-purple-800 flex items-center gap-1 ml-2">
+                                <div className="w-2 h-2 bg-purple-600 rounded-full animate-pulse" />
+                                AI Summarized
+                              </Badge>
+                            )}
+                          </div>
+                          <Button variant="outline" size="sm">
+                            Read More
+                            <ArrowRight className="w-3 h-3 ml-1" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="issues" className="space-y-6">
+                {/* Filters */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Find Issues</CardTitle>
+                    <CardDescription>Filter issues by difficulty, language, and keywords</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-col md:flex-row gap-4">
+                      <div className="flex-1">
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+                          <Input
+                            placeholder="Search issues..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-10"
+                          />
+                        </div>
+                      </div>
+                      <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
+                        <SelectTrigger className="w-full md:w-40">
+                          <SelectValue placeholder="Difficulty" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Levels</SelectItem>
+                          <SelectItem value="easy">Easy</SelectItem>
+                          <SelectItem value="moderate">Moderate</SelectItem>
+                          <SelectItem value="hard">Hard</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Select value={languageFilter} onValueChange={setLanguageFilter}>
+                        <SelectTrigger className="w-full md:w-40">
+                          <SelectValue placeholder="Language" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Languages</SelectItem>
+                          <SelectItem value="Rust">Rust</SelectItem>
+                          <SelectItem value="C++">C++</SelectItem>
+                          <SelectItem value="OCaml">OCaml</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Issues List */}
+                <div className="space-y-4">
+                  {filteredIssues.map((issue) => (
+                    <Card key={issue.id} className="hover:shadow-md transition-shadow">
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div className="space-y-2">
+                            <CardTitle className="text-lg hover:text-blue-600 cursor-pointer">{issue.title}</CardTitle>
+                            <div className="flex items-center gap-2 text-sm text-slate-500">
+                              <span>{issue.repository}</span>
+                              <span>•</span>
+                              <span>{issue.language}</span>
+                              <span>•</span>
+                              <span>{issue.createdAt}</span>
+                              {issue.assignee && (
+                                <>
+                                  <span>•</span>
+                                  <span>Assigned to {issue.assignee}</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge className={getDifficultyColor(issue.difficulty)}>{issue.difficulty}</Badge>
+                            <Button variant="ghost" size="sm">
+                              <ExternalLink className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-slate-600 mb-4">{issue.description}</p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex gap-2">
+                            {issue.labels.map((label) => (
+                              <Badge key={label} variant="outline" className="text-xs">
+                                {label}
+                              </Badge>
+                            ))}
+                          </div>
+                          <Button variant="outline" size="sm" disabled={!!issue.assignee}>
+                            {issue.assignee ? "Assigned" : "Claim Issue"}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
-      </header>
-
-      <div className="container mx-auto px-4 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Welcome back!</h1>
-          <p className="text-slate-600 dark:text-slate-300">
-            Stay up to date with the latest discussions and contribution opportunities.
-          </p>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Discussions</CardTitle>
-              <MessageSquare className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">24</div>
-              <p className="text-xs text-muted-foreground">+3 from last week</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Open Issues</CardTitle>
-              <GitBranch className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">156</div>
-              <p className="text-xs text-muted-foreground">42 beginner-friendly</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Contributors</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">1,247</div>
-              <p className="text-xs text-muted-foreground">+89 this month</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Main Content */}
-        <Tabs defaultValue="discussions" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="discussions">Recent Discussions</TabsTrigger>
-            <TabsTrigger value="issues">Available Issues</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="discussions" className="space-y-6">
-            {/* Quick Add Discussion */}
-            <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/50 dark:to-purple-950/50 border-blue-200 dark:border-blue-800">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <MessageSquare className="w-5 h-5 text-blue-600" />
-                  Quick Summarize
-                </CardTitle>
-                <CardDescription>Enter a GitHub discussion link or ID to generate an AI summary</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="GitHub discussion URL or ID..."
-                    value={discussionInput}
-                    onChange={(e) => setDiscussionInput(e.target.value)}
-                    className="flex-1"
-                    disabled={isLoadingDiscussion}
-                  />
-                  <Button
-                    onClick={handleAddDiscussion}
-                    disabled={!discussionInput.trim() || isLoadingDiscussion}
-                    className="shrink-0"
-                  >
-                    {isLoadingDiscussion ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                        Summarizing...
-                      </>
-                    ) : (
-                      "Summarize"
-                    )}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="space-y-4">
-              {dashboardDiscussions.map((discussion) => (
-                <Card key={discussion.id} className="hover:shadow-md transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-2">
-                        <CardTitle className="text-lg hover:text-blue-600 cursor-pointer">{discussion.title}</CardTitle>
-                        <div className="flex items-center gap-2 text-sm text-slate-500">
-                          <span>{discussion.repository}</span>
-                          <span>•</span>
-                          <div className="flex items-center gap-1">
-                            <Users className="w-3 h-3" />
-                            {discussion.participants} participants
-                          </div>
-                          <span>•</span>
-                          <div className="flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {discussion.lastActivity}
-                          </div>
-                        </div>
-                      </div>
-                      <Button variant="ghost" size="sm">
-                        <ExternalLink className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-slate-600 mb-4">{discussion.summary}</p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex gap-2">
-                        {discussion.tags.map((tag) => (
-                          <Badge key={tag} variant="secondary" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                        {discussion.tags.includes("ai-summarized") && (
-                          <Badge className="bg-purple-100 text-purple-800 flex items-center gap-1 ml-2">
-                            <div className="w-2 h-2 bg-purple-600 rounded-full animate-pulse" />
-                            AI Summarized
-                          </Badge>
-                        )}
-                      </div>
-                      <Button variant="outline" size="sm">
-                        Read More
-                        <ArrowRight className="w-3 h-3 ml-1" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="issues" className="space-y-6">
-            {/* Filters */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Find Issues</CardTitle>
-                <CardDescription>Filter issues by difficulty, language, and keywords</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="flex-1">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-                      <Input
-                        placeholder="Search issues..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10"
-                      />
-                    </div>
-                  </div>
-                  <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
-                    <SelectTrigger className="w-full md:w-40">
-                      <SelectValue placeholder="Difficulty" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Levels</SelectItem>
-                      <SelectItem value="easy">Easy</SelectItem>
-                      <SelectItem value="moderate">Moderate</SelectItem>
-                      <SelectItem value="hard">Hard</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select value={languageFilter} onValueChange={setLanguageFilter}>
-                    <SelectTrigger className="w-full md:w-40">
-                      <SelectValue placeholder="Language" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Languages</SelectItem>
-                      <SelectItem value="Rust">Rust</SelectItem>
-                      <SelectItem value="C++">C++</SelectItem>
-                      <SelectItem value="OCaml">OCaml</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Issues List */}
-            <div className="space-y-4">
-              {filteredIssues.map((issue) => (
-                <Card key={issue.id} className="hover:shadow-md transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-2">
-                        <CardTitle className="text-lg hover:text-blue-600 cursor-pointer">{issue.title}</CardTitle>
-                        <div className="flex items-center gap-2 text-sm text-slate-500">
-                          <span>{issue.repository}</span>
-                          <span>•</span>
-                          <span>{issue.language}</span>
-                          <span>•</span>
-                          <span>{issue.createdAt}</span>
-                          {issue.assignee && (
-                            <>
-                              <span>•</span>
-                              <span>Assigned to {issue.assignee}</span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge className={getDifficultyColor(issue.difficulty)}>{issue.difficulty}</Badge>
-                        <Button variant="ghost" size="sm">
-                          <ExternalLink className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-slate-600 mb-4">{issue.description}</p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex gap-2">
-                        {issue.labels.map((label) => (
-                          <Badge key={label} variant="outline" className="text-xs">
-                            {label}
-                          </Badge>
-                        ))}
-                      </div>
-                      <Button variant="outline" size="sm" disabled={!!issue.assignee}>
-                        {issue.assignee ? "Assigned" : "Claim Issue"}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </div>
+      )}
+    </>
   )
 }

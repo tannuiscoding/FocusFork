@@ -1,13 +1,30 @@
+"use client"
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { GitBranch, MessageSquare, Users, Zap, Bell, Mail } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { useState } from "react"
+import { useAuth } from "@/components/AuthProvider"
+import SignInModal from "@/components/SignInModal"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu"
+import { supabase } from "@/lib/supabaseClient"
 
 export default function HomePage() {
+  const { user } = useAuth?.() || {}
+  const [modalOpen, setModalOpen] = useState(false)
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+      <SignInModal open={modalOpen} onOpenChange={setModalOpen} />
       {/* Header */}
       <header className="border-b bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -41,6 +58,30 @@ export default function HomePage() {
           </nav>
           <div className="flex items-center gap-2">
             <ThemeToggle />
+            {!user && (
+              <Button variant="outline" onClick={() => setModalOpen(true)}>
+                Sign In
+              </Button>
+            )}
+            {user && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Avatar className="cursor-pointer">
+                    <AvatarImage src={user.user_metadata?.avatar_url || undefined} alt={user.email || "User"} />
+                    <AvatarFallback>{user.email?.[0]?.toUpperCase() || "U"}</AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={async () => {
+                      await supabase.auth.signOut()
+                    }}
+                  >
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
             <Button asChild>
               <Link href="/dashboard">Get Started</Link>
             </Button>
