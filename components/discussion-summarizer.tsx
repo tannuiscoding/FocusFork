@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Sparkles, Lock } from "lucide-react"
+import { Sparkles } from "lucide-react"
 import { useAuth } from "@/components/AuthProvider"
-import SignInModal from "@/components/SignInModal"
+
 
 interface Discussion {
   id: number
@@ -29,77 +29,65 @@ interface DiscussionSummarizerProps {
 export function DiscussionSummarizer({ onDiscussionAdded, className }: DiscussionSummarizerProps) {
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
   const [lastSummary, setLastSummary] = useState<Discussion | null>(null)
-  const [showSignInModal, setShowSignInModal] = useState(false)
+
   const { user } = useAuth()
 
   const handleSummarize = async () => {
-    if (!user) {
-      setShowSignInModal(true)
+    if (!input.trim()) return
+
+    const urlPattern = /^https:\/\/github\.com\/[^\/]+\/[^\/]+\/discussions\/\d+$/
+    if (!urlPattern.test(input)) {
+      setError("Please enter a valid GitHub discussion URL (e.g., https://github.com/owner/repo/discussions/123)")
       return
     }
-
-    if (!input.trim()) return
 
     setIsLoading(true)
 
     try {
-      // Simulate API call to GitHub and AI summarization
-      await new Promise((resolve) => setTimeout(resolve, 3000))
-
-      // Extract discussion info from URL or ID
-      const discussionId = input.includes("github.com") ? input.split("/").pop() : input
-
-      // Mock different discussion topics based on ID
-      const mockTopics = [
-        {
-          title: "Advanced memory allocation strategies",
-          repository: "memory-management",
-          summary:
-            "This discussion explores various memory allocation strategies including arena allocation, pool allocation, and hybrid approaches. Key points include performance trade-offs, memory fragmentation concerns, and implementation complexity. The community is leaning towards a hybrid approach that combines the benefits of both strategies.",
-          tags: ["memory", "allocation", "performance"],
+      const response = await fetch("/api/discussions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        {
-          title: "Type system improvements for generic constraints",
-          repository: "type-system",
-          summary:
-            "Discussion focuses on enhancing generic type constraints to provide better compile-time guarantees while maintaining ergonomics. Participants debate syntax alternatives, backward compatibility, and integration with existing type inference systems.",
-          tags: ["types", "generics", "constraints"],
-        },
-        {
-          title: "Async runtime optimization techniques",
-          repository: "async-runtime",
-          summary:
-            "Community discussion on optimizing async runtime performance through work-stealing schedulers, task batching, and memory pool reuse. Benchmarks show 40% improvement in throughput with proposed changes.",
-          tags: ["async", "runtime", "optimization"],
-        },
-      ]
+        body: JSON.stringify({ discussionUrl: input }),
+      })
 
-      const randomTopic = mockTopics[Math.floor(Math.random() * mockTopics.length)]
-
-      const newDiscussion: Discussion = {
-        id: Date.now(),
-        title: `Discussion #${discussionId}: ${randomTopic.title}`,
-        repository: randomTopic.repository,
-        summary: `AI-generated summary: ${randomTopic.summary}`,
-        participants: Math.floor(Math.random() * 25) + 5,
-        lastActivity: "Just now",
-        tags: [...randomTopic.tags, "ai-summarized"],
-        trending: Math.random() > 0.7,
-        replies: Math.floor(Math.random() * 60) + 15,
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to summarize discussion")
       }
 
-      setLastSummary(newDiscussion)
-      onDiscussionAdded(newDiscussion)
-      setInput("")
+      const data = await response.json()
+      
+      if (data.success && data.summary) {
+        const newDiscussion: Discussion = {
+          id: Date.now(),
+          title: data.summary.title,
+          repository: data.summary.repository,
+          summary: data.summary.summary,
+          participants: data.summary.participants,
+          lastActivity: data.summary.lastActivity,
+          tags: data.summary.tags,
+          trending: data.summary.trending,
+          replies: data.summary.replies,
+        }
+
+        setLastSummary(newDiscussion)
+        onDiscussionAdded(newDiscussion)
+        setInput("")
+        setError("")
+      }
     } catch (error) {
       console.error("Failed to summarize discussion:", error)
+      setError(error instanceof Error ? error.message : "Failed to summarize discussion")
     } finally {
       setIsLoading(false)
     }
   }
 
-  const isValidInput = input.trim() && (input.includes("github.com/") || /^\d+$/.test(input.trim()))
+  const isValidInput = input.trim() && /^https:\/\/github\.com\/[^\/]+\/[^\/]+\/discussions\/\d+$/.test(input.trim())
 
   return (
     <div className={className}>
@@ -110,75 +98,67 @@ export function DiscussionSummarizer({ onDiscussionAdded, className }: Discussio
             AI Discussion Summarizer
           </CardTitle>
           <CardDescription>
-            {user ? "Enter a GitHub discussion URL or ID to generate an intelligent summary" : "Sign in to summarize GitHub discussions"}
+            Enter a GitHub discussion URL or ID to generate an intelligent summary
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {user ? (
-            <>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="https://github.com/org/repo/discussions/123 or just 123"
+          <div className="flex gap-2">
+                            <Input
+                  placeholder="https://github.com/owner/repo/discussions/123"
                   value={input}
-                  onChange={(e) => setInput(e.target.value)}
+                  onChange={(e) => {
+                    setInput(e.target.value)
+                    if (error) setError("")
+                  }}
                   className="flex-1"
                   disabled={isLoading}
                 />
-                <Button onClick={handleSummarize} disabled={!isValidInput || isLoading} className="shrink-0 min-w-[120px]">
-                  {isLoading ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                      Analyzing...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      Summarize
-                    </>
-                  )}
-                </Button>
-              </div>
+            <Button onClick={handleSummarize} disabled={!isValidInput || isLoading} className="shrink-0 min-w-[120px]">
+              {isLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Summarize
+                </>
+              )}
+                          </Button>
+            </div>
 
-              {!isValidInput && input.trim() && (
+            {error && (
+              <div className="mt-3 p-3 bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 rounded-lg">
+                <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+              </div>
+            )}
+
+                          {!isValidInput && input.trim() && (
                 <p className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 p-2 rounded border border-amber-200 dark:border-amber-800">
-                  Please enter a valid GitHub discussion URL or numeric ID
+                  Please enter a valid GitHub discussion URL (e.g., https://github.com/owner/repo/discussions/123)
                 </p>
               )}
 
-              {lastSummary && (
-                <div className="mt-4 p-4 bg-white dark:bg-slate-800 rounded-lg border border-green-200 dark:border-green-800">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Badge className="bg-green-100 text-green-800">✓ Successfully Summarized</Badge>
-                    <Badge className="bg-purple-100 text-purple-800">
-                      <Sparkles className="w-3 h-3 mr-1" />
-                      AI Generated
-                    </Badge>
-                  </div>
-                  <h4 className="font-medium text-sm text-slate-700 dark:text-slate-300 mb-1">{lastSummary.title}</h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Added to discussions • {lastSummary.participants} participants
-                  </p>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="text-center py-8">
-              <Lock className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Authentication Required</h3>
-              <p className="text-slate-600 dark:text-slate-400 mb-4">You need to sign in to summarize GitHub discussions.</p>
-              <Button
-                onClick={() => setShowSignInModal(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                Sign In to Continue
-              </Button>
+          {lastSummary && (
+            <div className="mt-4 p-4 bg-white dark:bg-slate-800 rounded-lg border border-green-200 dark:border-green-800">
+              <div className="flex items-center gap-2 mb-2">
+                <Badge className="bg-green-100 text-green-800">✓ Successfully Summarized</Badge>
+                <Badge className="bg-purple-100 text-purple-800">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  AI Generated
+                </Badge>
+              </div>
+              <h4 className="font-medium text-sm text-slate-700 dark:text-slate-300 mb-1">{lastSummary.title}</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Added to discussions • {lastSummary.participants} participants
+              </p>
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Sign In Modal */}
-      <SignInModal open={showSignInModal} onOpenChange={setShowSignInModal} />
+
     </div>
   )
 }

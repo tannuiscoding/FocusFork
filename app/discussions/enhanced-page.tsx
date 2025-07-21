@@ -20,7 +20,6 @@ import {
   Sparkles,
 } from "lucide-react"
 
-// Initial discussions data
 const initialDiscussions = [
   {
     id: 1,

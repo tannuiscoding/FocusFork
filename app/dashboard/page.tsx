@@ -1,9 +1,12 @@
 "use client"
 
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { useAuth } from "@/components/AuthProvider"
 import {
   GitBranch,
   MessageSquare,
@@ -19,6 +22,27 @@ import {
 } from "lucide-react"
 
 export default function DashboardPage() {
+  const { user, loading } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/")
+    }
+  }, [user, loading, router])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#0f0520" }}>
+        <div className="text-white">Loading...</div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return null
+  }
+
   const activeDiscussions = [
     {
       id: 1,
@@ -118,7 +142,7 @@ export default function DashboardPage() {
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2 text-cosmic-primary">Dashboard</h1>
-          <p className="text-cosmic-secondary">Your hub for programming language development activities</p>
+          <p className="text-cosmic-secondary">Your hub for development collaboration activities</p>
         </div>
 
         {/* Stats Overview */}

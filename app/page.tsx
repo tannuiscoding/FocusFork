@@ -31,15 +31,19 @@ export default function HomePage() {
             </span>
           </div>
           <nav className="hidden md:flex items-center gap-6">
-            <Link href="/dashboard" className="text-cosmic-secondary hover:text-cosmic-primary transition-colors">
-              Dashboard
-            </Link>
-            <Link href="/discussions" className="text-cosmic-secondary hover:text-cosmic-primary transition-colors">
-              Discussions
-            </Link>
-            <Link href="/issues" className="text-cosmic-secondary hover:text-cosmic-primary transition-colors">
-              Issues
-            </Link>
+            {user && (
+              <>
+                <Link href="/dashboard" className="text-cosmic-secondary hover:text-cosmic-primary transition-colors">
+                  Dashboard
+                </Link>
+                <Link href="/discussions" className="text-cosmic-secondary hover:text-cosmic-primary transition-colors">
+                  Discussions
+                </Link>
+                <Link href="/issues" className="text-cosmic-secondary hover:text-cosmic-primary transition-colors">
+                  Issues
+                </Link>
+              </>
+            )}
           </nav>
           <div className="flex items-center gap-2">
             {!user && (
@@ -88,14 +92,14 @@ export default function HomePage() {
             Features
           </Badge>
           <h1 className="text-5xl md:text-6xl font-bold mb-6 text-cosmic-primary leading-tight">
-            Powerful Features to
+            AI-Powered GitHub
             <br />
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Simplify Your Workflow
+              Discussion Summarization
             </span>
           </h1>
           <p className="text-xl text-cosmic-secondary mb-12 max-w-2xl mx-auto leading-relaxed">
-            Discover how our AI-driven tools can transform your productivity and streamline your development journey
+            Transform lengthy GitHub discussions into concise, actionable summaries with our advanced AI technology. Stay informed and contribute effectively to any project.
           </p>
         </div>
       </section>
@@ -111,16 +115,15 @@ export default function HomePage() {
                 AI-Powered Summarization
               </Badge>
               <h2 className="text-4xl font-bold text-cosmic-primary">
-                Automate{" "}
+                Transform GitHub{" "}
                 <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Discussion
+                  Discussions
                 </span>
                 <br />
-                Summarization
+                Into Insights
               </h2>
               <p className="text-lg text-cosmic-secondary leading-relaxed">
-                Our solution reduces manual effort, minimizes errors, and ensures seamless coordination, allowing you to
-                focus on what truly matters.
+                Paste any GitHub discussion URL and get instant AI-generated summaries. Extract key points, understand community sentiment, and identify trending topics without reading through hundreds of comments.
               </p>
             </div>
             <div className="feature-mockup p-6 animate-float">
@@ -136,7 +139,7 @@ export default function HomePage() {
                       <div>
                         <p className="text-cosmic-primary text-sm font-medium">Key Discussion Points</p>
                         <p className="text-cosmic-muted text-xs">
-                          Memory management strategies and performance implications
+                          Type system improvements and generic constraints discussion
                         </p>
                       </div>
                     </div>
@@ -146,7 +149,7 @@ export default function HomePage() {
                       <div className="w-2 h-2 bg-accent rounded-full mt-2"></div>
                       <div>
                         <p className="text-cosmic-primary text-sm font-medium">Community Consensus</p>
-                        <p className="text-cosmic-muted text-xs">Hybrid approach combining multiple strategies</p>
+                        <p className="text-cosmic-muted text-xs">Enhanced syntax with backward compatibility</p>
                       </div>
                     </div>
                   </div>
@@ -155,7 +158,7 @@ export default function HomePage() {
                       <div className="w-2 h-2 bg-primary rounded-full mt-2"></div>
                       <div>
                         <p className="text-cosmic-primary text-sm font-medium">Action Items</p>
-                        <p className="text-cosmic-muted text-xs">Implementation timeline and next steps</p>
+                        <p className="text-cosmic-muted text-xs">Gradual migration path for existing codebases</p>
                       </div>
                     </div>
                   </div>
@@ -214,17 +217,16 @@ export default function HomePage() {
             <div className="space-y-6 order-1 lg:order-2">
               <Badge className="feature-badge px-3 py-1 text-sm">
                 <Bell className="w-4 h-4 mr-2" />
-                Smart Reminders
+                GitHub Issue Analysis
               </Badge>
               <h2 className="text-4xl font-bold text-cosmic-primary">
-                Get Smart{" "}
-                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Alerts</span> to
+                Analyze GitHub{" "}
+                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Repository Issues</span>
                 <br />
-                Stay on Track
+                Instantly
               </h2>
               <p className="text-lg text-cosmic-secondary leading-relaxed">
-                Our system ensures your tasks with intelligent notifications that alert you to important updates and
-                deadlines.
+                Paste any GitHub repository URL and get instant analysis of open issues. Filter by difficulty, identify beginner-friendly opportunities, and understand project health at a glance.
               </p>
             </div>
           </div>
@@ -236,56 +238,55 @@ export default function HomePage() {
             <div className="space-y-6">
               <Badge className="feature-badge px-3 py-1 text-sm">
                 <CheckSquare className="w-4 h-4 mr-2" />
-                Task Management
+                Discussion Tracking
               </Badge>
               <h2 className="text-4xl font-bold text-cosmic-primary">
-                Organize Your
+                Track Important
                 <br />
-                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Tasks</span>{" "}
-                Easily
+                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Discussions</span>{" "}
+                & Summaries
               </h2>
               <p className="text-lg text-cosmic-secondary leading-relaxed">
-                Keep your tasks in order with minimal effort. Our tools help you quickly organize and prioritize your
-                workload, so you can stay focused and get more done.
+                Keep track of important GitHub discussions and their AI-generated summaries. Organize insights by project, topic, or priority to stay informed across multiple repositories.
               </p>
             </div>
             <div className="feature-mockup p-6 animate-float">
               <div className="space-y-4">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-cosmic-primary font-semibold">Task Dashboard</h3>
-                  <Badge className="bg-primary/30 text-white border-primary/40">Organized</Badge>
+                  <h3 className="text-cosmic-primary font-semibold">Discussion Dashboard</h3>
+                  <Badge className="bg-primary/30 text-white border-primary/40">Tracked</Badge>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="cosmic-card p-3 rounded-lg">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-primary">12</div>
-                      <div className="text-xs text-cosmic-muted">Active Issues</div>
+                      <div className="text-2xl font-bold text-primary">24</div>
+                      <div className="text-xs text-cosmic-muted">Discussions</div>
                     </div>
                   </div>
                   <div className="cosmic-card p-3 rounded-lg">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-accent">8</div>
-                      <div className="text-xs text-cosmic-muted">In Progress</div>
+                      <div className="text-xs text-cosmic-muted">Summarized</div>
                     </div>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <div className="cosmic-card p-2 rounded flex items-center gap-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-cosmic-primary text-sm">Fix Unicode support</span>
-                    <Badge className="ml-auto bg-green-500/30 text-green-200 text-xs border-green-500/40">Easy</Badge>
+                    <span className="text-cosmic-primary text-sm">Memory Management Discussion</span>
+                    <Badge className="ml-auto bg-green-500/30 text-green-200 text-xs border-green-500/40">Trending</Badge>
                   </div>
                   <div className="cosmic-card p-2 rounded flex items-center gap-2">
                     <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                    <span className="text-cosmic-primary text-sm">Optimize AST traversal</span>
+                    <span className="text-cosmic-primary text-sm">Type System Improvements</span>
                     <Badge className="ml-auto bg-yellow-500/30 text-yellow-200 text-xs border-yellow-500/40">
-                      Medium
+                      Active
                     </Badge>
                   </div>
                   <div className="cosmic-card p-2 rounded flex items-center gap-2">
                     <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                    <span className="text-cosmic-primary text-sm">Parser error recovery</span>
-                    <Badge className="ml-auto bg-red-500/30 text-red-200 text-xs border-red-500/40">Hard</Badge>
+                    <span className="text-cosmic-primary text-sm">Async Runtime Optimization</span>
+                    <Badge className="ml-auto bg-red-500/30 text-red-200 text-xs border-red-500/40">New</Badge>
                   </div>
                 </div>
               </div>
@@ -308,7 +309,7 @@ export default function HomePage() {
                       <BarChart3 className="w-4 h-4 text-primary mt-1" />
                       <div>
                         <p className="text-cosmic-primary text-sm font-medium">Based on your Rust expertise</p>
-                        <p className="text-cosmic-muted text-xs">3 new issues match your skill level</p>
+                        <p className="text-cosmic-muted text-xs">5 new discussions match your interests</p>
                       </div>
                     </div>
                   </div>
@@ -325,8 +326,8 @@ export default function HomePage() {
                     <div className="flex items-start gap-3">
                       <Zap className="w-4 h-4 text-primary mt-1" />
                       <div>
-                        <p className="text-cosmic-primary text-sm font-medium">Quick wins available</p>
-                        <p className="text-cosmic-muted text-xs">2 documentation issues you can complete today</p>
+                        <p className="text-cosmic-primary text-sm font-medium">Trending discussions</p>
+                        <p className="text-cosmic-muted text-xs">3 active discussions in your starred repos</p>
                       </div>
                     </div>
                   </div>
@@ -336,18 +337,17 @@ export default function HomePage() {
             <div className="space-y-6 order-1 lg:order-2">
               <Badge className="feature-badge px-3 py-1 text-sm">
                 <Settings className="w-4 h-4 mr-2" />
-                Personalized Experience
+                Smart Recommendations
               </Badge>
               <h2 className="text-4xl font-bold text-cosmic-primary">
-                Get Personalized
+                Discover Relevant
                 <br />
                 <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Suggestions
+                  Discussions
                 </span>
               </h2>
               <p className="text-lg text-cosmic-secondary leading-relaxed">
-                Receive customized suggestions that adapt to your behavior, optimizing your workflow and enhancing your
-                productivity.
+                Get personalized recommendations for GitHub discussions based on your interests and expertise. Stay informed about topics that matter to you across your favorite projects.
               </p>
             </div>
           </div>
@@ -361,19 +361,19 @@ export default function HomePage() {
           Seamless Integration
         </Badge>
         <h2 className="text-4xl font-bold text-cosmic-primary mb-8">
-          Integrate with
+          Built for
           <br />
-          <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Popular Apps</span>
+          <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">GitHub</span>
         </h2>
         <div className="flex justify-center gap-6 mt-12">
           <div className="cosmic-card p-4 rounded-lg cosmic-glow">
-            <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 bg-gray-800 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">GH</span>
             </div>
           </div>
           <div className="cosmic-card p-4 rounded-lg cosmic-glow">
-            <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">DC</span>
+            <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-lg">AI</span>
             </div>
           </div>
           <div className="cosmic-card p-4 rounded-lg cosmic-glow">
@@ -389,7 +389,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4 py-20 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-cosmic-primary">Ready to Contribute?</h2>
           <p className="text-xl mb-8 text-cosmic-secondary max-w-2xl mx-auto">
-            Join thousands of developers contributing to programming language development through FocusFork
+            Join thousands of developers collaborating on projects through FocusFork
           </p>
           <Button size="lg" asChild className="btn-cosmic text-lg px-8">
             <Link href="/dashboard">Start Exploring</Link>
@@ -409,7 +409,7 @@ export default function HomePage() {
                 <span className="font-bold text-cosmic-primary">FocusFork</span>
               </div>
               <p className="text-sm text-cosmic-muted">
-                Streamlining collaboration in the Programming Language Developer Guild
+                Streamlining collaboration in development teams
               </p>
             </div>
             <div>
@@ -474,7 +474,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t border-border mt-8 pt-8 text-center text-sm text-cosmic-muted">
-            <p>&copy; 2024 FocusFork. Built for the Programming Language Developer Guild community.</p>
+            <p>&copy; {new Date().getFullYear()} FocusFork. Built for the development community.</p>
           </div>
         </div>
       </footer>

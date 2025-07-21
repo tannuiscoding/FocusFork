@@ -1,17 +1,19 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { GitBranch, Search, Users, ExternalLink, Clock, Star, GitPullRequest, Loader2, AlertCircle, Lock } from "lucide-react"
+import { GitBranch, Search, Users, ExternalLink, Clock, Star, GitPullRequest, Loader2, AlertCircle } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useAuth } from "@/components/AuthProvider"
-import SignInModal from "@/components/SignInModal"
-import { supabase } from "@/lib/supabaseClient"
+
+
+
 
 interface GitHubIssue {
   id: number
@@ -46,6 +48,27 @@ interface GitHubIssue {
 }
 
 export default function IssuesPage() {
+  const { user, loading: authLoading } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/")
+    }
+  }, [user, authLoading, router])
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#0f0520" }}>
+        <div className="text-white">Loading...</div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return null
+  }
+
   const [repoUrl, setRepoUrl] = useState("")
   const [issues, setIssues] = useState<GitHubIssue[]>([])
   const [loading, setLoading] = useState(false)
@@ -54,15 +77,11 @@ export default function IssuesPage() {
   const [difficultyFilter, setDifficultyFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState("all")
   const [sortBy, setSortBy] = useState("recent")
-  const [showSignInModal, setShowSignInModal] = useState(false)
 
-  const { user, loading: authLoading } = useAuth()
+
+
 
   const fetchIssues = async () => {
-    if (!user) {
-      setShowSignInModal(true)
-      return
-    }
 
     if (!repoUrl.trim()) {
       setError("Please enter a repository URL")
@@ -73,7 +92,6 @@ export default function IssuesPage() {
     setError("")
 
     try {
-      // Extract owner and repo from URL
       const urlMatch = repoUrl.match(/github\.com\/([^\/]+)\/([^\/]+)/)
       if (!urlMatch) {
         throw new Error("Invalid GitHub repository URL")
@@ -82,12 +100,10 @@ export default function IssuesPage() {
       const [, owner, repo] = urlMatch
       const cleanRepo = repo.replace(/\.git$/, "")
 
-      const { data: { session } } = await supabase.auth.getSession()
       const response = await fetch("/api/issues", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${session?.access_token}`,
         },
         body: JSON.stringify({ owner, repo: cleanRepo }),
       })
@@ -211,51 +227,37 @@ export default function IssuesPage() {
         <Card className="mb-8 cosmic-card">
           <CardHeader>
             <CardTitle className="text-lg text-white flex items-center gap-2">
-              <Lock className="w-5 h-5" />
+              <GitBranch className="w-5 h-5" />
               Enter Repository URL
             </CardTitle>
             <CardDescription className="text-white/70">
-              {user ? "Provide a GitHub repository URL to analyze its issues" : "Sign in to analyze repository issues"}
+              Provide a GitHub repository URL to analyze its issues
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {user ? (
-              <div className="flex gap-4">
-                <Input
-                  placeholder="https://github.com/owner/repository"
-                  value={repoUrl}
-                  onChange={(e) => setRepoUrl(e.target.value)}
-                  className="flex-1 cosmic-border text-white placeholder:text-white/50"
-                  onKeyPress={(e) => e.key === "Enter" && fetchIssues()}
-                />
-                <Button
-                  onClick={fetchIssues}
-                  disabled={loading}
-                  className="btn-cosmic"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Analyzing...
-                    </>
-                  ) : (
-                    "Analyze Issues"
-                  )}
-                </Button>
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <Lock className="w-12 h-12 text-white/40 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2 text-white">Authentication Required</h3>
-                <p className="text-white/70 mb-4">You need to sign in to analyze repository issues and access GitHub data.</p>
-                <Button
-                  onClick={() => setShowSignInModal(true)}
-                  className="btn-cosmic"
-                >
-                  Sign In to Continue
-                </Button>
-              </div>
-            )}
+            <div className="flex gap-4">
+              <Input
+                placeholder="https://github.com/owner/repository"
+                value={repoUrl}
+                onChange={(e) => setRepoUrl(e.target.value)}
+                className="flex-1 cosmic-border text-white placeholder:text-white/50"
+                onKeyPress={(e) => e.key === "Enter" && fetchIssues()}
+              />
+              <Button
+                onClick={fetchIssues}
+                disabled={loading}
+                className="btn-cosmic"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Analyzing...
+                  </>
+                ) : (
+                  "Analyze Issues"
+                )}
+              </Button>
+            </div>
             {error && (
               <Alert className="mt-4 border-red-500/30 bg-red-500/10">
                 <AlertCircle className="h-4 w-4 text-red-400" />
@@ -500,23 +502,7 @@ export default function IssuesPage() {
           </Card>
         )}
 
-        {issues.length === 0 && !loading && !user && (
-          <Card className="text-center py-12 cosmic-card">
-            <CardContent>
-              <Lock className="w-12 h-12 text-white/40 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2 text-white">Authentication Required</h3>
-              <p className="text-white/70 mb-4">Sign in to start analyzing GitHub repository issues.</p>
-              <Button
-                onClick={() => setShowSignInModal(true)}
-                className="btn-cosmic"
-              >
-                Sign In to Continue
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-
-        {issues.length === 0 && !loading && user && (
+        {issues.length === 0 && !loading && (
           <Card className="text-center py-12 cosmic-card">
             <CardContent>
               <GitBranch className="w-12 h-12 text-white/40 mx-auto mb-4" />
@@ -527,8 +513,7 @@ export default function IssuesPage() {
         )}
       </div>
 
-      {/* Sign In Modal */}
-      <SignInModal open={showSignInModal} onOpenChange={setShowSignInModal} />
+
     </div>
   )
 }

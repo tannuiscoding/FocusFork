@@ -1,12 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useAuth } from "@/components/AuthProvider"
 import {
   GitBranch,
   MessageSquare,
@@ -19,7 +21,6 @@ import {
   Sparkles,
 } from "lucide-react"
 
-// Extended mock data for discussions
 const allDiscussions = [
   {
     id: 1,
@@ -84,40 +85,85 @@ const allDiscussions = [
 ]
 
 export default function DiscussionsPage() {
+  const { user, loading } = useAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/")
+    }
+  }, [user, loading, router])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#0f0520" }}>
+        <div className="text-white">Loading...</div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return null
+  }
+
   const [searchTerm, setSearchTerm] = useState("")
   const [repositoryFilter, setRepositoryFilter] = useState("all")
   const [sortBy, setSortBy] = useState("recent")
   const [discussionInput, setDiscussionInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
   const [discussions, setDiscussions] = useState(allDiscussions)
 
   const handleAddDiscussion = async () => {
     if (!discussionInput.trim()) return
 
-    setIsLoading(true)
-
-    // Simulate API call to summarize discussion
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-
-    // Extract discussion ID from URL or use as-is if it's just an ID
-    const discussionId = discussionInput.includes("github.com") ? discussionInput.split("/").pop() : discussionInput
-
-    const newDiscussion = {
-      id: Date.now(),
-      title: `Discussion #${discussionId}: Advanced memory allocation strategies`,
-      repository: "memory-management",
-      summary:
-        "AI-generated summary: This discussion explores various memory allocation strategies including arena allocation, pool allocation, and hybrid approaches. Key points include performance trade-offs, memory fragmentation concerns, and implementation complexity. The community is leaning towards a hybrid approach that combines the benefits of both strategies.",
-      participants: Math.floor(Math.random() * 20) + 5,
-      lastActivity: "Just now",
-      tags: ["memory", "allocation", "performance", "ai-summarized"],
-      trending: false,
-      replies: Math.floor(Math.random() * 50) + 10,
+    const urlPattern = /^https:\/\/github\.com\/[^\/]+\/[^\/]+\/discussions\/\d+$/
+    if (!urlPattern.test(discussionInput)) {
+      setError("Please enter a valid GitHub discussion URL (e.g., https://github.com/owner/repo/discussions/123)")
+      return
     }
 
-    setDiscussions((prev) => [newDiscussion, ...prev])
-    setDiscussionInput("")
-    setIsLoading(false)
+    setIsLoading(true)
+
+    try {
+      const response = await fetch("/api/discussions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ discussionUrl: discussionInput }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to summarize discussion")
+      }
+
+      const data = await response.json()
+      
+      if (data.success && data.summary) {
+        const newDiscussion = {
+          id: Date.now(),
+          title: data.summary.title,
+          repository: data.summary.repository,
+          summary: data.summary.summary,
+          participants: data.summary.participants,
+          lastActivity: data.summary.lastActivity,
+          tags: data.summary.tags,
+          trending: data.summary.trending,
+          replies: data.summary.replies,
+        }
+
+        setDiscussions((prev) => [newDiscussion, ...prev])
+        setDiscussionInput("")
+        setError("")
+      }
+    } catch (error) {
+      console.error("Error summarizing discussion:", error)
+      setError(error instanceof Error ? error.message : "Failed to summarize discussion")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const filteredDiscussions = discussions
@@ -139,7 +185,7 @@ export default function DiscussionsPage() {
         case "replies":
           return b.replies - a.replies
         default:
-          return 0 // Keep original order for "recent"
+          return 0
       }
     })
 
@@ -183,7 +229,7 @@ export default function DiscussionsPage() {
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2 text-cosmic-primary">GitHub Discussions</h1>
-          <p className="text-cosmic-secondary">Stay informed with summarized discussions from FocusFork repositories</p>
+          <p className="text-cosmic-secondary">Stay informed with summarized discussions from GitHub repositories</p>
         </div>
 
         {/* Filters */}
@@ -203,9 +249,12 @@ export default function DiscussionsPage() {
               <h3 className="font-medium mb-3 text-purple-300">Summarize New Discussion</h3>
               <div className="flex gap-2">
                 <Input
-                  placeholder="Enter GitHub discussion URL or ID (e.g., https://github.com/org/repo/discussions/123 or just 123)"
+                  placeholder="Enter GitHub discussion URL (e.g., https://github.com/owner/repo/discussions/123)"
                   value={discussionInput}
-                  onChange={(e) => setDiscussionInput(e.target.value)}
+                  onChange={(e) => {
+                    setDiscussionInput(e.target.value)
+                    if (error) setError("")
+                  }}
                   className="flex-1 cosmic-border text-white placeholder:text-white/50"
                   disabled={isLoading}
                 />
@@ -224,6 +273,11 @@ export default function DiscussionsPage() {
                   )}
                 </Button>
               </div>
+              {error && (
+                <div className="mt-3 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                  <p className="text-red-300 text-sm">{error}</p>
+                </div>
+              )}
             </div>
 
             {/* Search and Filter Section */}

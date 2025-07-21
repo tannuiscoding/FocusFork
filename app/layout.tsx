@@ -7,9 +7,9 @@ import { AuthProvider } from "@/components/AuthProvider"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "FocusFork - Programming Language Developer Guild",
+  title: "FocusFork - AI-Powered Development Collaboration",
   description:
-    "Streamline collaboration in the Programming Language Developer Guild with AI-powered discussion summaries and issue tracking",
+    "Streamline collaboration with AI-powered discussion summaries and issue tracking for development teams",
     generator: 'v0.dev'
 }
 
