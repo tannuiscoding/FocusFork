@@ -27,7 +27,7 @@ export default function HomePage() {
               <GitBranch className="w-4 h-4 text-white" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              FocusForkmake
+              FocusFork
             </span>
           </div>
           <nav className="hidden md:flex items-center gap-6">
@@ -389,7 +389,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4 py-20 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-cosmic-primary">Ready to Contribute?</h2>
           <p className="text-xl mb-8 text-cosmic-secondary max-w-2xl mx-auto">
-            Join thousands of developers contributing to programming language development through PLDG
+            Join thousands of developers contributing to programming language development through FocusFork
           </p>
           <Button size="lg" asChild className="btn-cosmic text-lg px-8">
             <Link href="/dashboard">Start Exploring</Link>
@@ -406,7 +406,7 @@ export default function HomePage() {
                 <div className="w-6 h-6 bg-gradient-to-br from-primary to-accent rounded flex items-center justify-center cosmic-glow">
                   <GitBranch className="w-3 h-3 text-white" />
                 </div>
-                <span className="font-bold text-cosmic-primary">FocusForkmake</span>
+                <span className="font-bold text-cosmic-primary">FocusFork</span>
               </div>
               <p className="text-sm text-cosmic-muted">
                 Streamlining collaboration in the Programming Language Developer Guild
@@ -474,7 +474,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t border-border mt-8 pt-8 text-center text-sm text-cosmic-muted">
-            <p>&copy; 2024 FocusForkmake. Built for the Programming Language Developer Guild community.</p>
+            <p>&copy; 2024 FocusFork. Built for the Programming Language Developer Guild community.</p>
           </div>
         </div>
       </footer>

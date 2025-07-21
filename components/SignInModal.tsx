@@ -23,7 +23,7 @@ export default function SignInModal({ open, onOpenChange }: SignInModalProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-sm mx-auto">
         <DialogHeader>
-          <DialogTitle>Sign in to PLDG Hub</DialogTitle>
+          <DialogTitle>Sign in to FocusFork</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-4 py-4">
           <Button

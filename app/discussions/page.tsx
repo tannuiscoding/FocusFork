@@ -158,7 +158,7 @@ export default function DiscussionsPage() {
               <GitBranch className="w-4 h-4 text-white" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-violet-400 bg-clip-text text-transparent">
-              FocusForkmake
+              FocusFork
             </span>
           </Link>
           <nav className="hidden md:flex items-center gap-6">
@@ -183,7 +183,7 @@ export default function DiscussionsPage() {
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2 text-cosmic-primary">GitHub Discussions</h1>
-          <p className="text-cosmic-secondary">Stay informed with summarized discussions from PLDG repositories</p>
+          <p className="text-cosmic-secondary">Stay informed with summarized discussions from FocusFork repositories</p>
         </div>
 
         {/* Filters */}

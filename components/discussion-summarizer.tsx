@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Sparkles } from "lucide-react"
+import { Sparkles, Lock } from "lucide-react"
+import { useAuth } from "@/components/AuthProvider"
+import SignInModal from "@/components/SignInModal"
 
 interface Discussion {
   id: number
@@ -28,8 +30,15 @@ export function DiscussionSummarizer({ onDiscussionAdded, className }: Discussio
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [lastSummary, setLastSummary] = useState<Discussion | null>(null)
+  const [showSignInModal, setShowSignInModal] = useState(false)
+  const { user } = useAuth()
 
   const handleSummarize = async () => {
+    if (!user) {
+      setShowSignInModal(true)
+      return
+    }
+
     if (!input.trim()) return
 
     setIsLoading(true)
@@ -100,55 +109,76 @@ export function DiscussionSummarizer({ onDiscussionAdded, className }: Discussio
             <Sparkles className="w-5 h-5 text-blue-600" />
             AI Discussion Summarizer
           </CardTitle>
-          <CardDescription>Enter a GitHub discussion URL or ID to generate an intelligent summary</CardDescription>
+          <CardDescription>
+            {user ? "Enter a GitHub discussion URL or ID to generate an intelligent summary" : "Sign in to summarize GitHub discussions"}
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex gap-2">
-            <Input
-              placeholder="https://github.com/org/repo/discussions/123 or just 123"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              className="flex-1"
-              disabled={isLoading}
-            />
-            <Button onClick={handleSummarize} disabled={!isValidInput || isLoading} className="shrink-0 min-w-[120px]">
-              {isLoading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                  Analyzing...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Summarize
-                </>
-              )}
-            </Button>
-          </div>
-
-          {!isValidInput && input.trim() && (
-            <p className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 p-2 rounded border border-amber-200 dark:border-amber-800">
-              Please enter a valid GitHub discussion URL or numeric ID
-            </p>
-          )}
-
-          {lastSummary && (
-            <div className="mt-4 p-4 bg-white dark:bg-slate-800 rounded-lg border border-green-200 dark:border-green-800">
-              <div className="flex items-center gap-2 mb-2">
-                <Badge className="bg-green-100 text-green-800">✓ Successfully Summarized</Badge>
-                <Badge className="bg-purple-100 text-purple-800">
-                  <Sparkles className="w-3 h-3 mr-1" />
-                  AI Generated
-                </Badge>
+          {user ? (
+            <>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="https://github.com/org/repo/discussions/123 or just 123"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  className="flex-1"
+                  disabled={isLoading}
+                />
+                <Button onClick={handleSummarize} disabled={!isValidInput || isLoading} className="shrink-0 min-w-[120px]">
+                  {isLoading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Summarize
+                    </>
+                  )}
+                </Button>
               </div>
-              <h4 className="font-medium text-sm text-slate-700 dark:text-slate-300 mb-1">{lastSummary.title}</h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Added to discussions • {lastSummary.participants} participants
-              </p>
+
+              {!isValidInput && input.trim() && (
+                <p className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 p-2 rounded border border-amber-200 dark:border-amber-800">
+                  Please enter a valid GitHub discussion URL or numeric ID
+                </p>
+              )}
+
+              {lastSummary && (
+                <div className="mt-4 p-4 bg-white dark:bg-slate-800 rounded-lg border border-green-200 dark:border-green-800">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Badge className="bg-green-100 text-green-800">✓ Successfully Summarized</Badge>
+                    <Badge className="bg-purple-100 text-purple-800">
+                      <Sparkles className="w-3 h-3 mr-1" />
+                      AI Generated
+                    </Badge>
+                  </div>
+                  <h4 className="font-medium text-sm text-slate-700 dark:text-slate-300 mb-1">{lastSummary.title}</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Added to discussions • {lastSummary.participants} participants
+                  </p>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center py-8">
+              <Lock className="w-12 h-12 text-blue-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Authentication Required</h3>
+              <p className="text-slate-600 dark:text-slate-400 mb-4">You need to sign in to summarize GitHub discussions.</p>
+              <Button
+                onClick={() => setShowSignInModal(true)}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                Sign In to Continue
+              </Button>
             </div>
           )}
         </CardContent>
       </Card>
+
+      {/* Sign In Modal */}
+      <SignInModal open={showSignInModal} onOpenChange={setShowSignInModal} />
     </div>
   )
 }

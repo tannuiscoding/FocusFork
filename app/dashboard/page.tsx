@@ -93,7 +93,7 @@ export default function DashboardPage() {
               <GitBranch className="w-4 h-4 text-white" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-violet-400 bg-clip-text text-transparent">
-              FocusForkmake
+              FocusFork
             </span>
           </Link>
           <nav className="hidden md:flex items-center gap-6">

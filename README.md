@@ -1,8 +1,8 @@
-# 🌟 FocusForkmake
+# 🌟 FocusFork
 
 > **A cosmic hub for programming language development collaboration**
 
-FocusForkmake is an AI-powered platform that helps developers discover, summarize, and contribute to programming language development projects across GitHub repositories.
+FocusFork is an AI-powered platform that helps developers discover, summarize, and contribute to programming language development projects across GitHub repositories.
 
 ## ✨ Current Features
 
@@ -12,7 +12,7 @@ FocusForkmake is an AI-powered platform that helps developers discover, summariz
 - Track trending topics and important conversations
 
 ### 🔍 **Smart Issue Discovery**
-- Find contribution opportunities across PLDG repositories
+- Find contribution opportunities across FocusFork repositories
 - Filter by difficulty level, programming language, and repository
 - Identify beginner-friendly issues and high-impact contributions
 
@@ -57,4 +57,4 @@ Built with a stunning cosmic theme featuring:
 
 ---
 
-*Explore the cosmos of programming language development with FocusForkmake* ✨
+*Explore the cosmos of programming language development with FocusFork* ✨

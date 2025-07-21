@@ -105,7 +105,7 @@ export default function EnhancedDiscussionsPage() {
               <GitBranch className="w-4 h-4 text-white" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              PLDG Hub
+              FocusFork
             </span>
           </Link>
           <nav className="hidden md:flex items-center gap-6">
