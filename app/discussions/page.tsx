@@ -7,8 +7,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { GitBranch, MessageSquare, Search, Users, Clock, ExternalLink, ArrowRight, TrendingUp } from "lucide-react"
-import { ThemeToggle } from "@/components/theme-toggle"
+import {
+  GitBranch,
+  MessageSquare,
+  Search,
+  Users,
+  Clock,
+  ExternalLink,
+  ArrowRight,
+  TrendingUp,
+  Sparkles,
+} from "lucide-react"
 
 // Extended mock data for discussions
 const allDiscussions = [
@@ -137,81 +146,73 @@ export default function DiscussionsPage() {
   const repositories = [...new Set(allDiscussions.map((d) => d.repository))]
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div className="min-h-screen" style={{ background: "#0f0520" }}>
       {/* Header */}
-      <header className="border-b bg-white dark:bg-slate-800 sticky top-0 z-50">
+      <header
+        className="border-b cosmic-border sticky top-0 z-50"
+        style={{ background: "rgba(15, 5, 32, 0.95)", backdropFilter: "blur(20px)" }}
+      >
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-violet-600 rounded-lg flex items-center justify-center cosmic-glow">
               <GitBranch className="w-4 h-4 text-white" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              PLDG Hub
+            <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-violet-400 bg-clip-text text-transparent">
+              FocusForkmake
             </span>
           </Link>
           <nav className="hidden md:flex items-center gap-6">
-            <Link
-              href="/dashboard"
-              className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
-            >
+            <Link href="/dashboard" className="text-white/70 hover:text-white transition-colors">
               Dashboard
             </Link>
-            <Link href="/discussions" className="text-blue-600 font-medium">
+            <Link href="/discussions" className="text-purple-400 font-medium">
               Discussions
             </Link>
-            <Link
-              href="/issues"
-              className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
-            >
+            <Link href="/issues" className="text-white/70 hover:text-white transition-colors">
               Issues
             </Link>
           </nav>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <Button variant="outline">
-              <Users className="w-4 h-4 mr-2" />
-              Profile
-            </Button>
-          </div>
+          <Button variant="outline" className="cosmic-border text-white hover:bg-purple-600/20 bg-transparent">
+            <Users className="w-4 h-4 mr-2" />
+            Profile
+          </Button>
         </div>
       </header>
 
       <div className="container mx-auto px-4 py-8">
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">GitHub Discussions</h1>
-          <p className="text-slate-600 dark:text-slate-300">
-            Stay informed with summarized discussions from PLDG repositories
-          </p>
+          <h1 className="text-3xl font-bold mb-2 text-cosmic-primary">GitHub Discussions</h1>
+          <p className="text-cosmic-secondary">Stay informed with summarized discussions from PLDG repositories</p>
         </div>
 
         {/* Filters */}
-        <Card className="mb-8">
+        <Card className="mb-8 cosmic-card">
           <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
+            <CardTitle className="text-lg flex items-center gap-2 text-white">
               <MessageSquare className="w-5 h-5" />
               Add & Find Discussions
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-white/70">
               Enter a GitHub discussion link or ID to generate an AI summary, or search existing discussions
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Add Discussion Section */}
-            <div className="p-4 bg-blue-50 dark:bg-blue-950/50 rounded-lg border border-blue-200 dark:border-blue-800">
-              <h3 className="font-medium mb-3 text-blue-900 dark:text-blue-100">Summarize New Discussion</h3>
+            <div className="p-4 rounded-lg border cosmic-border" style={{ background: "rgba(139, 92, 246, 0.1)" }}>
+              <h3 className="font-medium mb-3 text-purple-300">Summarize New Discussion</h3>
               <div className="flex gap-2">
                 <Input
                   placeholder="Enter GitHub discussion URL or ID (e.g., https://github.com/org/repo/discussions/123 or just 123)"
                   value={discussionInput}
                   onChange={(e) => setDiscussionInput(e.target.value)}
-                  className="flex-1"
+                  className="flex-1 cosmic-border text-white placeholder:text-white/50"
                   disabled={isLoading}
                 />
                 <Button
                   onClick={handleAddDiscussion}
                   disabled={!discussionInput.trim() || isLoading}
-                  className="shrink-0"
+                  className="shrink-0 btn-cosmic"
                 >
                   {isLoading ? (
                     <>
@@ -229,20 +230,20 @@ export default function DiscussionsPage() {
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/50 w-4 h-4" />
                   <Input
                     placeholder="Search discussions, topics, or tags..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 cosmic-border text-white placeholder:text-white/50"
                   />
                 </div>
               </div>
               <Select value={repositoryFilter} onValueChange={setRepositoryFilter}>
-                <SelectTrigger className="w-full md:w-48">
+                <SelectTrigger className="w-full md:w-48 cosmic-border text-white">
                   <SelectValue placeholder="Repository" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="cosmic-card">
                   <SelectItem value="all">All Repositories</SelectItem>
                   {repositories.map((repo) => (
                     <SelectItem key={repo} value={repo}>
@@ -252,10 +253,10 @@ export default function DiscussionsPage() {
                 </SelectContent>
               </Select>
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-full md:w-40">
+                <SelectTrigger className="w-full md:w-40 cosmic-border text-white">
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="cosmic-card">
                   <SelectItem value="recent">Most Recent</SelectItem>
                   <SelectItem value="trending">Trending</SelectItem>
                   <SelectItem value="participants">Most Active</SelectItem>
@@ -268,7 +269,7 @@ export default function DiscussionsPage() {
 
         {/* Results Summary */}
         <div className="mb-6">
-          <p className="text-slate-600 dark:text-slate-300">
+          <p className="text-cosmic-secondary">
             Showing {filteredDiscussions.length} discussion{filteredDiscussions.length !== 1 ? "s" : ""}
             {searchTerm && ` matching "${searchTerm}"`}
             {repositoryFilter !== "all" && ` in ${repositoryFilter}`}
@@ -278,32 +279,29 @@ export default function DiscussionsPage() {
         {/* Discussions List */}
         <div className="space-y-6">
           {filteredDiscussions.map((discussion) => (
-            <Card
-              key={discussion.id}
-              className="hover:shadow-lg transition-all duration-200 border-l-4 border-l-transparent hover:border-l-blue-500"
-            >
+            <Card key={discussion.id} className="cosmic-card hover:cosmic-glow transition-all duration-300">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="space-y-3 flex-1">
-                    <div className="flex items-center gap-2">
-                      <CardTitle className="text-xl hover:text-blue-600 cursor-pointer transition-colors">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <CardTitle className="text-xl text-white hover:text-purple-300 cursor-pointer transition-colors">
                         {discussion.title}
                       </CardTitle>
                       {discussion.trending && (
-                        <Badge className="bg-orange-100 text-orange-800 flex items-center gap-1">
-                          <TrendingUp className="w-3 h-3" />
+                        <Badge className="bg-orange-500/20 text-orange-300 border border-orange-500/30">
+                          <TrendingUp className="w-3 h-3 mr-1" />
                           Trending
                         </Badge>
                       )}
                       {discussion.tags.includes("ai-summarized") && (
-                        <Badge className="bg-purple-100 text-purple-800 flex items-center gap-1">
-                          <div className="w-2 h-2 bg-purple-600 rounded-full animate-pulse" />
+                        <Badge className="bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                          <Sparkles className="w-3 h-3 mr-1" />
                           AI Summarized
                         </Badge>
                       )}
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-slate-500">
-                      <span className="font-medium">{discussion.repository}</span>
+                    <div className="flex items-center gap-4 text-sm text-white/60 flex-wrap">
+                      <span className="font-medium text-purple-300">{discussion.repository}</span>
                       <div className="flex items-center gap-1">
                         <Users className="w-3 h-3" />
                         {discussion.participants} participants
@@ -318,26 +316,34 @@ export default function DiscussionsPage() {
                       </div>
                     </div>
                   </div>
-                  <Button variant="ghost" size="sm" className="shrink-0">
+                  <Button variant="ghost" size="sm" className="shrink-0 text-white/70 hover:text-white">
                     <ExternalLink className="w-4 h-4" />
                   </Button>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-slate-700 mb-4 leading-relaxed">{discussion.summary}</p>
-                <div className="flex items-center justify-between">
+                <p className="text-white/80 mb-4 leading-relaxed">{discussion.summary}</p>
+                <div className="flex items-center justify-between flex-wrap gap-4">
                   <div className="flex gap-2 flex-wrap">
                     {discussion.tags.map((tag) => (
-                      <Badge key={tag} variant="secondary" className="text-xs">
+                      <Badge
+                        key={tag}
+                        variant="secondary"
+                        className="text-xs bg-purple-500/10 text-purple-300 border border-purple-500/20"
+                      >
                         {tag}
                       </Badge>
                     ))}
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="cosmic-border text-white hover:bg-purple-600/20 bg-transparent"
+                    >
                       View Summary
                     </Button>
-                    <Button size="sm">
+                    <Button size="sm" className="btn-cosmic">
                       Join Discussion
                       <ArrowRight className="w-3 h-3 ml-1" />
                     </Button>
@@ -349,15 +355,14 @@ export default function DiscussionsPage() {
         </div>
 
         {filteredDiscussions.length === 0 && (
-          <Card className="text-center py-12">
+          <Card className="text-center py-12 cosmic-card">
             <CardContent>
-              <MessageSquare className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No discussions found</h3>
-              <p className="text-slate-600 mb-4">
-                Try adjusting your search terms or filters to find more discussions.
-              </p>
+              <MessageSquare className="w-12 h-12 text-white/40 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2 text-white">No discussions found</h3>
+              <p className="text-white/70 mb-4">Try adjusting your search terms or filters to find more discussions.</p>
               <Button
                 variant="outline"
+                className="cosmic-border text-white hover:bg-purple-600/20 bg-transparent"
                 onClick={() => {
                   setSearchTerm("")
                   setRepositoryFilter("all")

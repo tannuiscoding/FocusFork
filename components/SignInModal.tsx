@@ -39,4 +39,4 @@ export default function SignInModal({ open, onOpenChange }: SignInModalProps) {
       </DialogContent>
     </Dialog>
   )
-} 
+}
